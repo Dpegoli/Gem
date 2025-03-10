@@ -1,0 +1,20 @@
+{
+    "name": "lucid-test",
+    "version": "1.0.0",
+    "description": "A Lucid Cardano project",
+    "type": "module",
+    "scripts": {
+      "dev": "pnpm exec tsx test-lucid.ts",
+      "build": "tsc",
+      "start": "node dist/test-lucid.js"
+    },
+    "dependencies": {
+      "lucid-cardano": "^0.10.11",
+      "dotenv": "^16.3.1"
+    },
+    "devDependencies": {
+      "typescript": "^5.8.2",
+      "tsx": "^4.19.3",
+      "@types/node": "^22.13.9"
+    }
+  }
