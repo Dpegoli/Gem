@@ -2,16 +2,16 @@ import { Lucid } from "lucid-cardano";
 import { Blockfrost } from "lucid-cardano";
 import dotenv from "dotenv";
 
-dotenv.config(); // ✅ Load .env variables
+dotenv.config(); //  Load .env variables
 
-const apiKey = process.env.BLOCKFROST_API_KEY; // ✅ Use API key from .env
+const apiKey = process.env.BLOCKFROST_API_KEY; //  Use API key from .env
 
-console.log("✅ Lucid loaded:", Lucid);
-console.log("🔑 Blockfrost API Key Loaded:", apiKey ? "Yes" : "No");
+console.log("Lucid loaded:", Lucid);
+console.log(" Blockfrost API Key Loaded:", apiKey ? "Yes" : "No");
 
 async function main() {
   if (!apiKey) {
-    console.error("❌ Blockfrost API Key is missing. Check your .env file.");
+    console.error(" Blockfrost API Key is missing. Check your .env file.");
     return;
   }
 
@@ -21,12 +21,12 @@ async function main() {
     "Preview"
   );
 
-  console.log("✅ Lucid is connected!");
+  console.log(" Lucid is connected!");
   
   // ✅ Fetch network parameters to confirm connection
   const protocolParams = await lucid.provider.getProtocolParameters();
-  console.log("✅ Blockfrost is connected and responding!");
-  console.log("🌐 Protocol Parameters:", protocolParams);
+  console.log(" Blockfrost is connected and responding!");
+  console.log(" Protocol Parameters:", protocolParams);
 
   // ✅ Check if the browser has a Cardano wallet
   const walletName = "nami"; // Change to "eternl" if using Eternl
