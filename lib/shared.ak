@@ -1,9 +1,8 @@
 use aiken/collection/list
 use aiken/crypto.{VerificationKeyHash}
-use aiken/interval.{Finite, IntervalBound}
+use aiken/interval.{Finite, Interval, IntervalBound}
 use cardano/transaction.{Transaction, ValidityRange}
 use types.{Accepted, Completed, Disputed, JobDatum, JobRedeemer, Open}
-use utils.{validate_slots}
 
 // Import all constructors of JobState
 
@@ -31,14 +30,29 @@ pub fn validate_working_day(
 pub fn accept_job(
   datum: JobDatum,
   redeemer: JobRedeemer,
-  signatories: List<VerificationKeyHash>,
+  signatories: List<ByteArray>,
   _tx: Transaction,
-  validity_range: ValidityRange,
+  validity_range: Interval<Int>,
 ) -> Bool {
+  // Ensure the escrow amount is correctly provided
+  let escrow_valid =
+    when redeemer.depositEscrow is {
+      Some(amount) -> amount == datum.escrow
+      None -> False
+    }
+
+  // If missing, fail validation properly
+  // Ensure the redeemer's signatory is present
+  let valid_signatory = list.has(signatories, datum.employer)
+
+  // Ensure the transaction is within the valid job period
+  let within_valid_time = interval.contains(validity_range, datum.start_time)
+
+  // Final check
   and {
-    must_be_signed_by(signatories, redeemer.reason),
-    datum.state == Open,
-    validate_slots(validity_range, datum.start_time, datum.end_time),
+    escrow_valid,
+    valid_signatory,
+    within_valid_time,
   }
 }
 
@@ -77,23 +91,33 @@ pub fn close_job(
 pub fn complete_job(
   datum: JobDatum,
   redeemer: JobRedeemer,
-  signatories: List<VerificationKeyHash>,
-  validity_range: ValidityRange,
+  signatories: List<ByteArray>,
+  validity_range: Interval<Int>,
 ) -> Bool {
-  and {
-    datum.state == Accepted,
-    // Ensure the job is in the Accepted state
+  // Ensure jobber exists
+  let jobber_exists =
     when datum.jobber is {
-      Some(jobber) -> jobber == redeemer.reason
-      // Validate the jobber matches the redeemer
+      Some(jobber) -> list.has(signatories, jobber)
       None -> False
-    },
-    // If no jobber is assigned, the completion is invalid
-    must_be_signed_by(signatories, redeemer.reason),
-    // Validate that the jobber signed the transaction
-    validate_working_day(validity_range, datum.start_time, datum.end_time),
+    }
+
+  // Ensure completion is within job timeframe
+  let within_time = interval.is_entirely_before(validity_range, datum.end_time)
+
+  // Validate escrow release
+  let escrow_valid =
+    when redeemer.withdrawEscrow is {
+      Some(amount) -> amount == datum.escrow
+      None -> False
+    }
+
+  // Missing escrow, fail validation
+  // Ensure all conditions are met
+  and {
+    jobber_exists,
+    within_time,
+    escrow_valid,
   }
-  // Ensure the transaction is within working hours
 }
 
 /// Function to dispute a job
