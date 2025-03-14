@@ -1,6 +1,6 @@
 import { Lucid, Blockfrost } from "lucid-cardano";
-import dotenv from "dotenv";
-import fs from "fs";
+import * as dotenv from "dotenv";
+import * as fs from "fs";
 
 dotenv.config();
 

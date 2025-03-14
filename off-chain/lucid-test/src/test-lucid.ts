@@ -1,6 +1,6 @@
 import { Lucid } from "lucid-cardano";
 import { Blockfrost } from "lucid-cardano";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 
 dotenv.config(); //  Load .env variables
 
@@ -32,7 +32,8 @@ async function main() {
   const walletName = "nami"; // Change to "eternl" if using Eternl
   if (typeof window !== "undefined" && window.cardano) {
     console.log("🔗 Connecting to wallet:", walletName);
-    await lucid.selectWalletFromExtension(walletName);
+    const walletApi = await window.cardano[walletName].enable();
+    lucid.selectWallet(walletApi);
   } else {
     console.error("No wallet extension found. Open Nami or Eternl and enable it.");
     return;
