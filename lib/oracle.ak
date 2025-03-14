@@ -10,7 +10,7 @@ pub fn verify_resume(
 ) -> Bool {
   and {
     must_be_signed_by(signatories, job_datum.employer),
-    // ✅ Ensure employer verifies resume
+    // Ensure employer verifies resume
     when job_datum.resumeEvidence is {
       Some(evidence) -> evidence == redeemer.verifyresume
       None -> False

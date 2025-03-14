@@ -35,7 +35,7 @@ pub type JobRedeemer {
   depositEscrow: Option<Int>,
   withdrawEscrow: Option<Int>,
   quitJob: Bool,
-  //  quitJob → Allows jobber to exit while ensuring partial payment (if applicable).
+  //  quitJob  Allows jobber to exit while ensuring partial payment (if applicable).
   disputeTimeout: Bool,
 }
 

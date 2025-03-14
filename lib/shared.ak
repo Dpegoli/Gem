@@ -140,7 +140,6 @@ pub fn timeout_dispute(
   signatories: List<VerificationKeyHash>,
   current_time: Int,
 ) -> Bool {
-  // ✅ Change ValidityRange to Int
   and {
     datum.state == Accepted || datum.state == Disputed,
     // ✅ Job must be active or already disputed
@@ -187,13 +186,14 @@ pub fn cancel_job(
 
 /// Ensures escrow funds are locked before accepting a job
 pub fn validate_escrow(datum: JobDatum, transaction: Transaction) -> Bool {
-  // ✅ Removed `redeemer`
-  and {
-    datum.state == Open,
-    // Job must be open
-    datum.escrow >= datum.pay,
-    // ✅ Ensure escrow matches or exceeds pay
-    must_be_signed_by(transaction.extra_signatories, datum.employer),
+  when datum.state is {
+    Open -> and {
+        datum.escrow >= datum.pay,
+        must_be_signed_by(transaction.extra_signatories, datum.employer),
+      }
+    Accepted -> False
+    Completed -> False
+    Disputed -> False
   }
 }
 
@@ -208,7 +208,7 @@ pub fn withdraw_escrow(
     must_be_signed_by(signatories, datum.employer),
     datum.escrow > 0,
   }
-  // ✅ Ensure there is escrow to withdraw
+  // Ensure there is escrow to withdraw
 }
 
 pub fn quit_job(
@@ -224,10 +224,18 @@ pub fn quit_job(
       Some(jobber) -> must_be_signed_by(signatories, jobber)
       None -> False
     },
-    // ❌ Can't quit if no jobber assigned
+    // Can't quit if no jobber assigned
     datum.start_time + 2_000 < current_time,
-    // ✅ Ensure jobber worked a minimum duration
+    // Ensure jobber worked a minimum duration
     datum.escrow > 0,
   }
-  // ✅ Escrow must be available for partial refund
+  // Escrow must be available for partial refund
+}
+
+// `extract_time` function
+pub fn extract_time(bound: IntervalBound<Int>) -> Int {
+  when bound.bound_type is {
+    Finite(time) -> time
+    _ -> fail @"Invalid transaction time"
+  }
 }

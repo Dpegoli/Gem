@@ -17,7 +17,7 @@ async function main() {
     new Blockfrost("https://cardano-preview.blockfrost.io/api/v0", apiKey),
     "Preview"
   );
-  console.log("✅ Lucid is connected to Blockfrost!");
+  console.log("Lucid is connected to Blockfrost!");
 
   try {
     // 🔹 Select Lace Wallet (Modify this line to support Lace)
