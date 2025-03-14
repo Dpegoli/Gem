@@ -1,11 +1,9 @@
 use aiken/interval.{Finite, Interval, IntervalBound}
-use cardano/transaction.{OutputReference, Transaction}
+use cardano/transaction.{Transaction}
 use shared.{validate_escrow}
 use types.{JobDatum, Open}
 
 test test_validate_escrow() {
-  let utxo_ref = OutputReference("", 0)
-
   let valid_datum =
     JobDatum {
       job_id: 1,

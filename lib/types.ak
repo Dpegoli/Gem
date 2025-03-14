@@ -1,5 +1,4 @@
 use aiken/crypto.{ScriptHash, VerificationKeyHash}
-use cardano/assets.{Lovelace, PolicyId}
 use cardano/transaction.{OutputReference}
 
 pub type JobState {

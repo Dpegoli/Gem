@@ -1,13 +1,16 @@
-use aiken/collection/list
-use aiken/crypto.{VerificationKeyHash}
-use aiken/interval.{Finite, IntervalBound}
-use cardano/transaction.{OutputReference, Transaction, ValidityRange}
+////trying new validator with schedule hours and escrow 
+
+//use aiken/collection/list
+//use aiken/crypto.{VerificationKeyHash}
+use aiken/interval.{Interval}
+use cardano/transaction.{OutputReference, Transaction}
 use shared.{
   accept_job, cancel_job, complete_job, dispute_job, extract_time,
   validate_escrow,
 }
 use types.{JobDatum, JobRedeemer}
-use utils.{validate_slots}
+
+//use utils.{validate_slots}
 
 // validator workday_validator {
 //   spend(

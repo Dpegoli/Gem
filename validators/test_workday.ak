@@ -1,10 +1,9 @@
 use aiken/interval.{Finite, Interval, IntervalBound}
-use cardano/transaction.{OutputReference, Transaction}
+use cardano/transaction.{Transaction}
 use shared.{accept_job}
 use types.{JobDatum, JobRedeemer, Open}
 
 test test_accept_job() {
-  let utxo_ref = OutputReference("", 0)
   let datum =
     JobDatum {
       job_id: 1,

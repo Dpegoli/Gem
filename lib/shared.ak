@@ -32,13 +32,13 @@ pub fn accept_job(
   datum: JobDatum,
   redeemer: JobRedeemer,
   signatories: List<VerificationKeyHash>,
-  tx: Transaction,
+  _tx: Transaction,
   validity_range: ValidityRange,
 ) -> Bool {
   and {
     must_be_signed_by(signatories, redeemer.reason),
     datum.state == Open,
-    validate_slots(tx.validity_range, datum.start_time, datum.end_time),
+    validate_slots(validity_range, datum.start_time, datum.end_time),
   }
 }
 
@@ -157,7 +157,7 @@ pub fn cancel_job(
   datum: JobDatum,
   redeemer: JobRedeemer,
   signatories: List<VerificationKeyHash>,
-  tx: Transaction,
+  _tx: Transaction,
 ) -> Bool {
   if redeemer.reason == datum.employer {
     // Cancellation initiated by the employer
