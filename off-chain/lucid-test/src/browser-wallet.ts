@@ -32,7 +32,11 @@ async function main() {
     console.log("🎉 Lace Wallet Connected!");
     console.log("🏦 Wallet Address:", address);
   } catch (error) {
-    console.error("❌ Error:", error.message);
+    if (error instanceof Error) {
+      console.error("❌ Error:", error.message);
+    } else {
+      console.error("❌ Unknown error occurred");
+    }
   }
 }
 

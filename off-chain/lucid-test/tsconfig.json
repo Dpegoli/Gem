@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "target": "ESNext",
-    "outDir": "dist",
-    "rootDir": "src"
-  }
+    "target": "ES6",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "strict": true
+  },
+  "include": ["src/**/*.ts"]
 }
