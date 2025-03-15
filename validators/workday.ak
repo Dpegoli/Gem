@@ -145,7 +145,6 @@ validator workday_validator {
               redeemer,
               transaction.extra_signatories,
               transaction,
-              transaction.validity_range,
             )
           1 ->
             cancel_job(

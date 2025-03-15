@@ -26,34 +26,55 @@ pub fn validate_working_day(
   }
 }
 
-/// Function to validate that a job is open
 pub fn accept_job(
   datum: JobDatum,
   redeemer: JobRedeemer,
   signatories: List<ByteArray>,
-  _tx: Transaction,
-  validity_range: Interval<Int>,
+  tx: Transaction,
 ) -> Bool {
-  // Ensure the escrow amount is correctly provided
+  // Ensure job is still Open
+  expect Open = datum.state
+
+  // Ensure jobber provides a valid resume
+  let resume_valid =
+    when datum.resumeEvidence is {
+      Some(expected_resume) -> redeemer.verifyresume == expected_resume
+      None -> False
+    }
+
+  // Ensure jobber exists and has signed
+  let jobber_signed =
+    when datum.jobber is {
+      Some(jobber) -> list.has(signatories, jobber)
+      None -> False
+    }
+
+  // Ensure employer has signed to approve the jobber
+  let employer_signed = list.has(signatories, datum.employer)
+
+  // Ensure correct escrow deposit
   let escrow_valid =
     when redeemer.depositEscrow is {
       Some(amount) -> amount == datum.escrow
       None -> False
     }
 
-  // If missing, fail validation properly
-  // Ensure the redeemer's signatory is present
-  let valid_signatory = list.has(signatories, datum.employer)
+  // Verify transaction validity (valid range for acceptance)
+  let within_validity = interval.contains(tx.validity_range, datum.start_time)
 
-  // Ensure the transaction is within the valid job period
-  let within_valid_time = interval.contains(validity_range, datum.start_time)
-
-  // Final check
+  // Ensure all conditions are met
   and {
+    resume_valid,
+    // Jobber must provide a valid resume
+    jobber_signed,
+    // Jobber must sign
+    employer_signed,
+    // Employer must approve the jobber
     escrow_valid,
-    valid_signatory,
-    within_valid_time,
+    // Jobber must deposit escrow
+    within_validity,
   }
+  // Transaction must be within the correct validity range
 }
 
 /// Function to abort the job
@@ -94,27 +115,34 @@ pub fn complete_job(
   signatories: List<ByteArray>,
   validity_range: Interval<Int>,
 ) -> Bool {
-  // Ensure jobber exists
-  let jobber_exists =
+  // Ensure job is still Open
+  expect Open = datum.state
+
+  // Ensure jobber exists and has signed
+  let jobber_signed =
     when datum.jobber is {
       Some(jobber) -> list.has(signatories, jobber)
       None -> False
     }
 
+  // Ensure employer has signed to approve completion
+  let employer_signed = list.has(signatories, datum.employer)
+
   // Ensure completion is within job timeframe
   let within_time = interval.is_entirely_before(validity_range, datum.end_time)
 
-  // Validate escrow release
+  // Validate escrow release (jobber gets refund if job is completed)
   let escrow_valid =
     when redeemer.withdrawEscrow is {
       Some(amount) -> amount == datum.escrow
       None -> False
     }
 
-  // Missing escrow, fail validation
+  // If escrow is missing, fail validation
   // Ensure all conditions are met
   and {
-    jobber_exists,
+    jobber_signed,
+    employer_signed,
     within_time,
     escrow_valid,
   }
@@ -166,14 +194,14 @@ pub fn timeout_dispute(
 ) -> Bool {
   and {
     datum.state == Accepted || datum.state == Disputed,
-    // ✅ Job must be active or already disputed
+    // Job must be active or already disputed
     must_be_signed_by(signatories, redeemer.reason),
-    // ✅ Jobber or employer must trigger timeout
+    // Jobber or employer must trigger timeout
     datum.end_time + 10_000 < current_time,
-    // ✅ Job has exceeded max allowed time
+    // Job has exceeded max allowed time
     datum.withdrawEscrow != None,
   }
-  // ✅ Ensure escrow is available for payout
+  // Ensure escrow is available for payout
 }
 
 /// Function to cancel a job
