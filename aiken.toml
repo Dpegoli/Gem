@@ -1,6 +1,6 @@
 name = "shift/gem"
 version = "0.0.0"
-compiler = "v1.1.4"
+compiler = "v1.1.15"
 plutus = "v3"
 license = "Apache-2.0"
 description = "Aiken contracts for project 'shift/gem'"

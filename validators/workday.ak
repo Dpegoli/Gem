@@ -1,13 +1,14 @@
-////trying new validator with schedule hours and escrow 
-
 use aiken/collection/list
 use aiken/interval.{Interval}
-use cardano/transaction.{OutputReference, Transaction}
+use cardano/address.{Address, Credential}
+use cardano/assets
+use cardano/transaction.{Input, Output, OutputReference, Transaction}
 use shared.{
   accept_job, cancel_job, complete_job, dispute_job, extract_time,
   validate_escrow,
 }
-use types.{JobDatum, JobRedeemer}
+use types.{Accepted, JobDatum, JobRedeemer}
+//use utils.{validate_workday}
 
 //use utils.{validate_slots}
 
@@ -170,6 +171,58 @@ validator workday_validator {
           _ -> fail @"Invalid redeemer action"
         }
       False -> fail @"Transaction is invalid: Time or Escrow issue"
+    }
+  }
+
+  else(_) {
+    fail @"Only spend operations are supported"
+  }
+}
+
+//PAYMENT VALIDATOR//////////////////
+
+validator job_payment_validator {
+  spend(
+    datum: Option<JobDatum>,
+    redeemer: JobRedeemer,
+    _own_ref: OutputReference,
+    tx: Transaction,
+  ) {
+    // Ensure datum is present
+    expect Some(job_datum) = datum
+
+    // Pattern-match on the job state to ensure it’s Accepted
+    when job_datum.state is {
+      Accepted -> {
+        // Now check the redeemer action:
+        when redeemer.action is {
+          2 -> {
+            // Employer must have signed the transaction
+            expect True = list.has(tx.extra_signatories, job_datum.employer)
+
+            // Ensure jobber is assigned and that the payment output exists
+            when job_datum.jobber is {
+              Some(jobber_pkh) -> {
+                let jobber_address = Address {
+                  payment_credential: Credential.VerificationKey(jobber_pkh),
+                  stake_credential: None,
+                }
+                expect True = list.any(
+                  tx.outputs,
+                  fn(output) {
+                    output.address == jobber_address &&
+                    assets.lovelace_of(output.value) >= job_datum.pay
+                  }
+                )
+                True
+              }
+              None -> fail @"No jobber assigned"
+            }
+          }
+          _ -> fail @"Invalid redeemer action"
+        }
+      }
+      _ -> fail @"Job state must be Accepted"
     }
   }
 

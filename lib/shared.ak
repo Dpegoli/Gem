@@ -1,8 +1,15 @@
 use aiken/collection/list
-use aiken/crypto.{VerificationKeyHash}
+use aiken/crypto.{
+  Blake2b_256, Hash, Signature, VerificationKey,
+  VerificationKeyHash, blake2b_256, verify_ed25519_signature,
+}
 use aiken/interval.{Finite, Interval, IntervalBound}
 use cardano/transaction.{Transaction, ValidityRange}
-use types.{Accepted, Completed, Disputed, JobDatum, JobRedeemer, Open}
+use types.{
+  Accepted, Completed, Disputed, JobDatum, JobRedeemer, Open,
+}
+
+//use utils.{prevent_double_spend}
 
 // Import all constructors of JobState
 
@@ -290,4 +297,23 @@ pub fn extract_time(bound: IntervalBound<Int>) -> Int {
     Finite(time) -> time
     _ -> fail @"Invalid transaction time"
   }
+}
+
+pub fn must_happen_before(range: ValidityRange, time_limit: Int) -> Bool {
+  when range.upper_bound.bound_type is {
+    Finite(tx_time) -> tx_time >= time_limit
+    _ -> False
+  }
+}
+
+pub fn store_transaction_hash(tx_data: ByteArray) -> Hash<Blake2b_256, Data> {
+  blake2b_256(tx_data)
+}
+
+pub fn verify_signature(
+  employer_pubkey: VerificationKey,
+  message: ByteArray,
+  signature: Signature,
+) -> Bool {
+  verify_ed25519_signature(employer_pubkey, message, signature)
 }
