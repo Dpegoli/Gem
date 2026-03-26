@@ -1,5 +1,4 @@
-import { Lucid } from "lucid-cardano";
-import { Blockfrost } from "lucid-cardano";
+import { Blockfrost, Lucid } from "lucid-cardano";
 import * as dotenv from "dotenv";
 
 dotenv.config(); //  Load .env variables
@@ -12,6 +11,7 @@ console.log(" Blockfrost API Key Loaded:", apiKey ? "Yes" : "No");
 async function main() {
   if (!apiKey) {
     console.error(" Blockfrost API Key is missing. Check your .env file.");
+    console.error(" Copy .env.example to .env and add your Preview API key.");
     return;
   }
 
@@ -27,21 +27,8 @@ async function main() {
   const protocolParams = await lucid.provider.getProtocolParameters();
   console.log(" Blockfrost is connected and responding!");
   console.log(" Protocol Parameters:", protocolParams);
-
-  // ✅ Check if the browser has a Cardano wallet
-  const walletName = "nami"; // Change to "eternl" if using Eternl
-  if (typeof window !== "undefined" && window.cardano) {
-    console.log("🔗 Connecting to wallet:", walletName);
-    const walletApi = await window.cardano[walletName].enable();
-    lucid.selectWallet(walletApi);
-  } else {
-    console.error("No wallet extension found. Open Nami or Eternl and enable it.");
-    return;
-  }
-
-  // ✅ Get and display the wallet address
-  const walletAddress = await lucid.wallet.address();
-  console.log("🏦 Connected Wallet Address:", walletAddress);
+  console.log(" This script only verifies Lucid + Blockfrost connectivity.");
+  console.log(" Use src/browser-wallet.ts in a browser-capable context for wallet access.");
 }
 
 // ✅ Run the function

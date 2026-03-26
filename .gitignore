@@ -4,5 +4,10 @@ artifacts/
 build/
 # Aiken's default documentation export
 docs/
+dist/
 node_modules/
 .env
+*.tsbuildinfo
+off-chain/lucid-test/.env
+off-chain/lucid-test/wallet.json
+off-chain/lucid-test/dist/

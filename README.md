@@ -63,3 +63,30 @@ aiken docs
 ## Resources
 
 Find more on the [Aiken's user manual](https://aiken-lang.org).
+
+## Off-Chain Setup
+
+The off-chain Lucid prototype lives in `off-chain/lucid-test`.
+
+1. Copy `off-chain/lucid-test/.env.example` to `off-chain/lucid-test/.env`
+2. Add your Blockfrost Preview API key to `off-chain/lucid-test/.env`
+3. Build the package:
+
+```sh
+cd off-chain/lucid-test
+npm run build
+```
+
+4. Verify Blockfrost connectivity:
+
+```sh
+npm run dev
+```
+
+5. Optionally generate a local wallet file:
+
+```sh
+npm run wallet:generate
+```
+
+`wallet.json` and `.env` are local-only files and should never be committed.

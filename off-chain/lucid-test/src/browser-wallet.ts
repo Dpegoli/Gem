@@ -10,6 +10,7 @@ console.log("🔑 Blockfrost API Key Loaded:", apiKey ? "Yes" : "No");
 async function main() {
   if (!apiKey) {
     console.error("❌ Blockfrost API Key is missing. Check your .env file.");
+    console.error("Copy .env.example to .env and add your Preview API key.");
     return;
   }
 
@@ -20,6 +21,10 @@ async function main() {
   console.log("✅ Lucid is connected to Blockfrost!");
 
   try {
+    if (typeof window === "undefined") {
+      throw new Error("This script needs a browser wallet context.");
+    }
+
     if (!window.cardano || !window.cardano.lace) {
       throw new Error("Lace wallet not found. Please open Lace and enable it.");
     }

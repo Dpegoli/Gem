@@ -11,6 +11,7 @@ console.log("🔑 Blockfrost API Key Loaded:", apiKey ? "Yes" : "No");
 async function main() {
   if (!apiKey) {
     console.error("❌ Blockfrost API Key is missing. Check your .env file.");
+    console.error("Copy .env.example to .env and add your Preview API key.");
     return;
   }
 
@@ -35,6 +36,7 @@ async function main() {
     JSON.stringify({ privateKey, address }, null, 2)
   );
   console.log("💾 Wallet Saved to wallet.json");
+  console.log("🔒 Keep wallet.json private and never commit it.");
 }
 
 main().catch(console.error);
